@@ -45,7 +45,29 @@ function initializeApp(){
 function addClickHandlersToElements(){
     $(".btn-default").on("click", handleCancelClick);
     $(".btn-success").on("click", handleAddClicked);
+    $(".getData").on("click", handleGetDataClicked);
 
+}
+function handleGetDataClicked(){
+    var getData;
+    var ajaxConfig = {
+        dataType: 'json',
+        url: "https://s-apis.learningfuze.com/sgt/get",
+        method: "post",
+        data: {
+            api_key: "bTS3bJ6on1"
+        },
+        success: function(data){
+            getData = data;
+            getData.data.forEach((val) => {student_array.push(val);
+                updateStudentList(student_array);})
+
+
+
+        }
+
+    }
+    $.ajax(ajaxConfig);
 }
 
 /***************************************************************************************************
@@ -113,7 +135,7 @@ function renderStudentOnDom(studentObject){
     var studentCourseElement = $("<td>").text(studentObject.course);
     var studentGradeElement = $("<td>").text(studentObject.grade);
     var deleteContainer = $("<td>");
-    var deleteButton = $("<button>").addClass("btn btn-danger").text("Delete").attr("id", counter).on("click", function(){
+    var deleteButton = $("<button>").addClass("btn btn-danger").text("Delete").attr("id", studentObject.id).on("click", function(){
         handleDelete(this);
 
     });
