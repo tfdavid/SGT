@@ -23,7 +23,7 @@ $(document).ready(initializeApp);
 student_array=[
 
 ];
-var counter =0;
+
 
 
 /***************************************************************************************************
@@ -61,8 +61,6 @@ function handleGetDataClicked(){
             getData = data;
             getData.data.forEach((val) => {student_array.push(val);
                 updateStudentList(student_array);})
-
-
 
         }
 
@@ -109,7 +107,6 @@ function addStudent(){
     studentObject.name = studentName;
     studentObject.course = studentCourse;
     studentObject.grade = studentGrade;
-    studentObject.id = counter;
     student_array.push(studentObject);
     clearAddStudentFormInputs();
     updateStudentList(student_array);
@@ -135,14 +132,12 @@ function renderStudentOnDom(studentObject){
     var studentCourseElement = $("<td>").text(studentObject.course);
     var studentGradeElement = $("<td>").text(studentObject.grade);
     var deleteContainer = $("<td>");
-    var deleteButton = $("<button>").addClass("btn btn-danger").text("Delete").attr("id", studentObject.id).on("click", function(){
-        handleDelete(this);
-
+    var deleteButton = $("<button>").addClass("btn btn-danger").text("Delete").attr("id", studentObject.id).on("click", ()=>{
+        deleteStudentObject(studentObject, newRow);
     });
     $("thead").append(newRow);
     $(deleteContainer).append(deleteButton);
     $(newRow).append(studentNameElement, studentCourseElement, studentGradeElement, deleteContainer);
-    counter++;
 }
 
 /***************************************************************************************************
@@ -165,12 +160,7 @@ function calculateGradeAverage(studentArray){
     if(!student_array.length){
         return "";
     }
-    var sum = studentArray.reduce(addGrades, 0);
-
-    function addGrades(total, num) {
-        return total + parseFloat(num.grade);
-    }
-    var average = sum/studentArray.length;
+    var average = studentArray.reduce((total,num)=>{return total+parseFloat(num.grade)}, 0)/studentArray.length;
     average = Math.round(average*100)/100;
     return average;
 }
@@ -183,29 +173,11 @@ function renderGradeAverage(average){
     $(".avgGrade").text(average);
 }
 
-function handleDelete(event){
-    deleteStudentObject(event);
-    deleteFromDom(event);
+function deleteStudentObject(student, studentRow){
+    student_array.splice(student_array.indexOf(student),1);
+    $(studentRow).closest('tr').remove();
     var currentAverage = calculateGradeAverage(student_array);
     renderGradeAverage(currentAverage);
-}
-function deleteStudentObject(event){
-    // var index = $(event).attr("id");
-    // student_array.splice(index, 1);
-    var buttonIndex = $(event).attr("id");
-    for(var arrayIndex = 0; arrayIndex<student_array.length; arrayIndex++){
-        if(buttonIndex == student_array[arrayIndex].id){
-            student_array.splice(arrayIndex, 1);
-            return;
-        }
-    }
-
-
-}
-function deleteFromDom(event){
-    $(event).closest('tr').remove();
-
-
 }
 
 
