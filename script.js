@@ -59,6 +59,7 @@ function handleGetDataClicked(){
         },
         success: function(data){
             getData = data;
+            console.log(data);
             getData.data.forEach((val) => {student_array.push(val);
                 updateStudentList(student_array);})
 
@@ -174,10 +175,45 @@ function renderGradeAverage(average){
 }
 
 function deleteStudentObject(student, studentRow){
-    student_array.splice(student_array.indexOf(student),1);
-    $(studentRow).closest('tr').remove();
-    var currentAverage = calculateGradeAverage(student_array);
-    renderGradeAverage(currentAverage);
+    var ajaxConfig = {
+        dataType: 'json',
+        url: "https://s-apis.learningfuze.com/sgt/delete",
+        method: "post",
+        data: {
+            api_key: "bTS3bJ6on1",
+            student_id: student.id
+        },
+        success: function(data){
+            if(data.success){
+            console.log("success");
+            student_array.splice(student_array.indexOf(student),1);
+            $(studentRow).closest('tr').remove();
+            var currentAverage = calculateGradeAverage(student_array);
+            renderGradeAverage(currentAverage);
+        }
+            else{console.log("nope")}
+        },
+        error: function(){
+            console.log("didnt work bud");
+        }
+
+    }
+    $.ajax(ajaxConfig);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
