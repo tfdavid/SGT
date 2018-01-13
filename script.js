@@ -20,7 +20,7 @@ $(document).ready(initializeApp);
  * ];
  */
 student_array=[];
-
+var globalSortType;
 /***************************************************************************************************
 * initializeApp 
 * @params {undefined} none
@@ -47,15 +47,90 @@ function addClickHandlersToElements(){
 
     $("#cancelBtn").on("click", handleCancelClick);
     $("#addBtn").on("click", handleAddClicked);
-    $("#getData").on("click", dataUpdate);
+    $("#getData").on("click", ()=>dataUpdate(globalSortType));
 
-    $(".studentNameTitle").on("click", )
+    $(".studentNameTitle").on("click", ()=>{
+        if(globalSortType==="name"){
+            sortArray("nameRev");
+            return;
+        }
+        sortArray('name');
+    });
+    $(".studentCourseTitle").on("click", ()=>{
+        if(globalSortType==="course"){
+            sortArray("courseRev");
+            return;
+        }
+        sortArray('course');
+    });
+    $(".studentGradeTitle").on("click", ()=>{
+        if(globalSortType==="grade"){
+            sortArray("gradeRev");
+            return;
+        }
+        sortArray('grade');
 
-
-
+    });
+}
+function sortArray(sortType){
+    globalSortType = sortType;
+    $(".btn").button('reset');
+    $('tbody > tr').remove();
+    switch(sortType) {
+        case 'grade':             //sort by grade
+            student_array.sort((a,b)=>{
+                return b.grade-a.grade
+            });
+            globalSortType='grade';
+            break;
+        case 'gradeRev':             //sort by grade reverse
+            student_array.sort((a,b)=>{
+                return a.grade-b.grade
+            });
+            globalSortType='gradeRev';
+            break;
+        case 'name':              //sort by name
+            student_array.sort((first, second)=> {
+                return first.name.toLowerCase() < second.name.toLowerCase() ? -1 : 1;
+            });
+            globalSortType='name';
+            break;
+        case 'nameRev':              //sort by name reverse
+            student_array.sort((first, second)=> {
+                return first.name.toLowerCase() < second.name.toLowerCase() ? 1 : -1;
+            });
+            globalSortType='nameRev';
+            break;
+        case 'course':            //sort by course
+            student_array.sort((first, second)=> {
+                return first.course.toLowerCase() < second.course.toLowerCase() ? -1 : 1;
+            });
+            globalSortType='course';
+            break;
+        case 'courseRev':            //sort by course reverse
+            student_array.sort((first, second)=> {
+                return first.course.toLowerCase() < second.course.toLowerCase() ? 1 : -1;
+            });
+            globalSortType='courseRev';
+            break;
+        case "idrev" :                //sort by oldest
+            student_array.sort((a,b)=>{
+                return a.id - b.id;
+            });
+            globalSortType="idRev"
+            break;
+        default:                //sort by newest
+            student_array.sort((a,b)=>{
+                return b.id - a.id;
+            });
+            globalSortType="id"
+    }
+    student_array.forEach((val) => {
+        updateStudentList(val);
+    });
 }
 
-function dataUpdate(){
+function dataUpdate(sortType){
     var ajaxConfig = {
         dataType: 'json',
         url: "https://s-apis.learningfuze.com/sgt/get",
@@ -67,14 +142,11 @@ function dataUpdate(){
         // timeout: 5000,
         success: function(data){
             if(data.success) {
-                $(".btn").button('reset');
-                $('tbody > tr').remove();
                 student_array = [];
                 data.data.forEach((val) => {
                     student_array.push(val);
-                    updateStudentList(student_array);
-
-                })
+                });
+                sortArray(sortType);
                 return;
             }
             errorModalDisplay(data.error);
@@ -82,10 +154,9 @@ function dataUpdate(){
 
         },
         error: function(data){
-            console.log(data);
             errorModalDisplay(data.statusText);
         }
-    }
+    };
     $.ajax(ajaxConfig);
 }
 
@@ -160,7 +231,7 @@ function addStudentToServer(student){
                 delete student.api_key;
                 student_array.push(student);
                 clearAddStudentFormInputs();
-                updateStudentList(student_array);
+                sortArray(globalSortType);
                 return;
             }
             errorModalDisplay(data.error);
@@ -206,10 +277,10 @@ function renderStudentOnDom(studentObject){
  * @returns {undefined} none
  * @calls renderStudentOnDom, calculateGradeAverage, renderGradeAverage
  */
-function updateStudentList(studentArray){
-    renderStudentOnDom(studentArray[studentArray.length-1]);
-    var currentAverage = calculateGradeAverage(studentArray);
-    renderGradeAverage(currentAverage);
+function updateStudentList(student){
+    renderStudentOnDom(student);
+    calculateGradeAverage(student_array);
+
 }
 /***************************************************************************************************
  * calculateGradeAverage - loop through the global student array and calculate average grade and return that value
@@ -220,16 +291,17 @@ function calculateGradeAverage(studentArray){
     if(!student_array.length){
         return "";
     }
-    return (studentArray.reduce((total,num)=>{return total+parseFloat(num.grade)}, 0)/studentArray.length).toFixed(2);
+    var average= (studentArray.reduce((total,num)=>{return total+parseFloat(num.grade)}, 0)/studentArray.length).toFixed(2);
+    $(".avgGrade").text(average);
 }
 /***************************************************************************************************
  * renderGradeAverage - updates the on-page grade average
  * @param: {number} average    the grade average
  * @returns {undefined} none
  */
-function renderGradeAverage(average){
-    $(".avgGrade").text(average);
-}
+// function renderGradeAverage(average){
+//     $(".avgGrade").text(average);
+// }
 
 function deleteStudentObject(student, studentRow){
     var ajaxConfig = {
@@ -245,11 +317,10 @@ function deleteStudentObject(student, studentRow){
             $(".btn").button('reset');
             student_array.splice(student_array.indexOf(student),1);
             $(studentRow).closest('tr').remove();
-            var currentAverage = calculateGradeAverage(student_array);
-            renderGradeAverage(currentAverage);
+            calculateGradeAverage(student_array);
             return;
         }
-        errorModalDisplay(data.error);
+        errorModalDisplay(data.errors);
                   },
         error: function(data){
             errorModalDisplay(data.statusText);
@@ -258,12 +329,12 @@ function deleteStudentObject(student, studentRow){
     };
     $.ajax(ajaxConfig);
 }
-
 function errorModalDisplay(data){
     $('#errorModal .modal-body').text();
     $('#errorModal .modal-body').text(data);
     $('#errorModal').modal('show');
     $(".btn").button('reset');
+    clearAddStudentFormInputs();
 }
 
 
