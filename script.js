@@ -69,7 +69,13 @@ function addClickHandlersToElements(){
             return;
         }
         sortArray('grade');
-
+    });
+    $(".dateSort").on("click", ()=>{
+        if(globalSortType==="id"){
+            sortArray("idRev");
+            return;
+        }
+        sortArray();
     });
 }
 function sortArray(sortType){
@@ -113,11 +119,11 @@ function sortArray(sortType){
             });
             globalSortType='courseRev';
             break;
-        case "idrev" :                //sort by oldest
+        case "idRev" :                //sort by oldest
             student_array.sort((a,b)=>{
                 return a.id - b.id;
             });
-            globalSortType="idRev"
+            globalSortType="idRev";
             break;
         default:                //sort by newest
             student_array.sort((a,b)=>{
@@ -128,6 +134,7 @@ function sortArray(sortType){
     student_array.forEach((val) => {
         updateStudentList(val);
     });
+    $(".btn").button('reset');
 }
 
 function dataUpdate(sortType){
