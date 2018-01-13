@@ -7,7 +7,6 @@
  */
 $(document).ready(initializeApp);
 
-
 /**
  * Define all global variables here.  
  */
@@ -20,11 +19,7 @@ $(document).ready(initializeApp);
  *  { name: 'Jill', course: 'Comp Sci', grade: 85 }
  * ];
  */
-student_array=[
-
-];
-
-
+student_array=[];
 
 /***************************************************************************************************
 * initializeApp 
@@ -34,6 +29,7 @@ student_array=[
 */
 function initializeApp(){
     addClickHandlersToElements();
+    dataUpdate();
 }
 
 /***************************************************************************************************
@@ -43,28 +39,52 @@ function initializeApp(){
 *     
 */
 function addClickHandlersToElements(){
-    $(".btn-default").on("click", handleCancelClick);
-    $(".btn-success").on("click", handleAddClicked);
-    $(".getData").on("click", handleGetDataClicked);
+    $(".btn").attr("data-loading-text", "<i class='fa fa-spinner fa-spin'></i> Loading..");
+
+    $('.btn').on('click', function() {
+        $(this).button("loading");
+    });
+
+    $("#cancelBtn").on("click", handleCancelClick);
+    $("#addBtn").on("click", handleAddClicked);
+    $("#getData").on("click", dataUpdate);
+
+    $(".studentNameTitle").on("click", )
+
+
 
 }
-function handleGetDataClicked(){
-    var getData;
+
+function dataUpdate(){
     var ajaxConfig = {
         dataType: 'json',
         url: "https://s-apis.learningfuze.com/sgt/get",
         method: "post",
         data: {
-            api_key: "bTS3bJ6on1"
+            api_key: "bTS3bJ6on1",
+            // "force-failure": "request"
         },
+        // timeout: 5000,
         success: function(data){
-            getData = data;
+            if(data.success) {
+                $(".btn").button('reset');
+                $('tbody > tr').remove();
+                student_array = [];
+                data.data.forEach((val) => {
+                    student_array.push(val);
+                    updateStudentList(student_array);
+
+                })
+                return;
+            }
+            errorModalDisplay(data.error);
+
+
+        },
+        error: function(data){
             console.log(data);
-            getData.data.forEach((val) => {student_array.push(val);
-                updateStudentList(student_array);})
-
+            errorModalDisplay(data.statusText);
         }
-
     }
     $.ajax(ajaxConfig);
 }
@@ -76,9 +96,9 @@ function handleGetDataClicked(){
        none
  */
 function handleAddClicked(event){
-    addStudent();
-
+    makeStudent();
 }
+
 /***************************************************************************************************
  * handleCancelClicked - Event Handler when user clicks the cancel button, should clear out student form
  * @param: {undefined} none
@@ -87,7 +107,7 @@ function handleAddClicked(event){
  */
 function handleCancelClick(){
     clearAddStudentFormInputs();
-
+    $(".btn").button('reset');
 }
 /***************************************************************************************************
  * addStudent - creates a student objects based on input fields in the form and adds the object to global student array
@@ -95,25 +115,64 @@ function handleCancelClick(){
  * @return undefined
  * @calls clearAddStudentFormInputs, updateStudentList
  */
-function addStudent(){
-
+function makeStudent(){
     var studentName = $("#studentName").val();
     var studentCourse = $("#course").val();
     var studentGrade = $("#studentGrade").val();
     var studentObject = {};
     if (isNaN(parseFloat(studentGrade))){
-        window.alert("Not a valid grade number");
+        errorModalDisplay("Not a valid grade number");
+        clearAddStudentFormInputs();
+        return;
+    }
+    if(studentName.length < 2){
+        errorModalDisplay("Name must be at least two characters");
+        clearAddStudentFormInputs();
+        return;
+    }
+    if(studentGrade < 0 || studentGrade >100){
+        errorModalDisplay("Grade needs to be between 0-100");
+        clearAddStudentFormInputs();
+        return;
+    }
+    if(studentCourse.length < 2){
+        errorModalDisplay("Course must be greater than 2 chars");
+        clearAddStudentFormInputs();
         return;
     }
     studentObject.name = studentName;
     studentObject.course = studentCourse;
     studentObject.grade = studentGrade;
-    student_array.push(studentObject);
-    clearAddStudentFormInputs();
-    updateStudentList(student_array);
-
-
+    addStudentToServer(studentObject);
 }
+
+function addStudentToServer(student){
+    student.api_key = "bTS3bJ6on1";
+    var ajaxConfig = {
+        dataType: 'json',
+        url: "https://s-apis.learningfuze.com/sgt/create",
+        method: "post",
+        data: student,
+        success: function(data){
+            if(data.success){
+                $(".btn").button('reset');
+                student.id = data.new_id;
+                delete student.api_key;
+                student_array.push(student);
+                clearAddStudentFormInputs();
+                updateStudentList(student_array);
+                return;
+            }
+            errorModalDisplay(data.error);
+        },
+        error: function(data){
+            console.log(data);
+            errorModalDisplay(data.statusText);
+        }
+    };
+    $.ajax(ajaxConfig);
+}
+
 /***************************************************************************************************
  * clearAddStudentForm - clears out the form values based on inputIds variable
  */
@@ -136,7 +195,7 @@ function renderStudentOnDom(studentObject){
     var deleteButton = $("<button>").addClass("btn btn-danger").text("Delete").attr("id", studentObject.id).on("click", ()=>{
         deleteStudentObject(studentObject, newRow);
     });
-    $("thead").append(newRow);
+    $("tbody").append(newRow);
     $(deleteContainer).append(deleteButton);
     $(newRow).append(studentNameElement, studentCourseElement, studentGradeElement, deleteContainer);
 }
@@ -161,9 +220,7 @@ function calculateGradeAverage(studentArray){
     if(!student_array.length){
         return "";
     }
-    var average = studentArray.reduce((total,num)=>{return total+parseFloat(num.grade)}, 0)/studentArray.length;
-    average = Math.round(average*100)/100;
-    return average;
+    return (studentArray.reduce((total,num)=>{return total+parseFloat(num.grade)}, 0)/studentArray.length).toFixed(2);
 }
 /***************************************************************************************************
  * renderGradeAverage - updates the on-page grade average
@@ -185,40 +242,28 @@ function deleteStudentObject(student, studentRow){
         },
         success: function(data){
             if(data.success){
-            console.log("success");
+            $(".btn").button('reset');
             student_array.splice(student_array.indexOf(student),1);
             $(studentRow).closest('tr').remove();
             var currentAverage = calculateGradeAverage(student_array);
             renderGradeAverage(currentAverage);
+            return;
         }
-            else{console.log("nope")}
-        },
-        error: function(){
-            console.log("didnt work bud");
+        errorModalDisplay(data.error);
+                  },
+        error: function(data){
+            errorModalDisplay(data.statusText);
         }
 
-    }
+    };
     $.ajax(ajaxConfig);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
-
-
-
-
+function errorModalDisplay(data){
+    $('#errorModal .modal-body').text();
+    $('#errorModal .modal-body').text(data);
+    $('#errorModal').modal('show');
+    $(".btn").button('reset');
+}
 
 
