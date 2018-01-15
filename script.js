@@ -157,8 +157,6 @@ function dataUpdate(sortType){
                 return;
             }
             errorModalDisplay(data.error);
-
-
         },
         error: function(data){
             errorModalDisplay(data.statusText);
