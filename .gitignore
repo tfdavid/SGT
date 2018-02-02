@@ -1,3 +1,5 @@
 .DS_Store
 .idea
 README.md
+node_modules
+credentials.js

@@ -140,12 +140,12 @@ function sortArray(sortType){
 function dataUpdate(sortType){
     var ajaxConfig = {
         dataType: 'json',
-        url: "https://s-apis.learningfuze.com/sgt/get",
-        method: "post",
-        data: {
-            api_key: "bTS3bJ6on1",
-            // "force-failure": "request"
-        },
+        url: "users",
+        method: "get",
+        // data: {
+        //     api_key: "bTS3bJ6on1",
+        //     // "force-failure": "request"
+        // },
         // timeout: 5000,
         success: function(data){
             if(data.success) {
