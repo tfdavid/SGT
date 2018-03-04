@@ -149,6 +149,7 @@ function dataUpdate(sortType){
         // timeout: 5000,
         success: function(data){
             if(data.success) {
+                console.log("data is: ", data)
                 student_array = [];
                 data.data.forEach((val) => {
                     student_array.push(val);

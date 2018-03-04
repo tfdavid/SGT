@@ -9,22 +9,18 @@ const db = mysql.createConnection( mysqlCredentials );
 
 ws.use( express.static(path.join(__dirname, 'html' ) ) );
 
-ws.get('/users', function(req,res){
-    db.connect(function(){
-        db.query('SELECT * FROM students', function(error, rows, fields){
-            console.log(rows);
+ws.get('/users', (req,res,next)=>{
+    let query = 'SELECT * FROM students';
+    let sql = mysql.format(query)
+        db.query(sql, (err, results, fields)=>{
+            if (err) return next(err)
             const output={
                 success: true,
-                data: rows
+                data: results
             }
-            const json_output = JSON.stringify( output );
-            res.send( json_output );
-
-        })
-
+            res.json( output );
+        });
     });
-  
-});
 
 ws.listen(3000, function(){
     console.log('listening on port 3000')
