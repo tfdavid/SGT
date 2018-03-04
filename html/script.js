@@ -201,17 +201,15 @@ function makeStudent(){
 }
 
 function addStudentToServer(student){
-    student.api_key = "bTS3bJ6on1";
     var ajaxConfig = {
         dataType: 'json',
-        url: "",
+        url: "add",
         method: "post",
         data: student,
         success: function(data){
-            if(data.success){
+            if(data){
                 $(".btn").button('reset');
-                student.id = data.new_id;
-                delete student.api_key;
+                student.id = data.insertId;
                 student_array.push(student);
                 clearAddStudentFormInputs();
                 sortArray(globalSortType);
