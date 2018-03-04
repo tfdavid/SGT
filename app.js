@@ -31,8 +31,17 @@ app.post('/delete', (req,res,next)=>{
             if (err) return next(err)
             res.json(results);
         });
+});
+app.post('/add', (req,res,next)=>{
+    console.log("update: ", req.body);
+    const { name, course, grade } = req.body;
+    let query = 'INSERT INTO students SET ?'
+    let inserts = {name, course, grade, author:1};
+    db.query(query, inserts, (err, results, fields)=>{
+        if (err) return next(err)
+        res.json(results)
     });
-
+})
 
 app.listen(3000, function(){
     console.log('listening on port 3000')
