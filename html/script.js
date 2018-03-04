@@ -1,24 +1,6 @@
-/* information about jsdocs: 
-* param: http://usejsdoc.org/tags-param.html#examples
-* returns: http://usejsdoc.org/tags-returns.html
-* 
-/**
- * Listen for the document to load and initialize the application
- */
+
 $(document).ready(initializeApp);
 
-/**
- * Define all global variables here.  
- */
-/***********************
- * student_array - global array to hold student objects
- * @type {Array}
- * example of student_array after input: 
- * student_array = [
- *  { name: 'Jake', course: 'Math', grade: 85 },
- *  { name: 'Jill', course: 'Comp Sci', grade: 85 }
- * ];
- */
 student_array=[];
 var globalSortType;
 /***************************************************************************************************
@@ -142,16 +124,11 @@ function dataUpdate(sortType){
         dataType: 'json',
         url: "users",
         method: "get",
-        // data: {
-        //     api_key: "bTS3bJ6on1",
-        //     // "force-failure": "request"
-        // },
-        // timeout: 5000,
         success: function(data){
-            if(data.success) {
-                console.log("data is: ", data)
+            if(data) {
+                // console.log("data is: ", data)
                 student_array = [];
-                data.data.forEach((val) => {
+                data.forEach((val) => {
                     student_array.push(val);
                 });
                 sortArray(sortType);
@@ -227,7 +204,7 @@ function addStudentToServer(student){
     student.api_key = "bTS3bJ6on1";
     var ajaxConfig = {
         dataType: 'json',
-        url: "https://s-apis.learningfuze.com/sgt/create",
+        url: "",
         method: "post",
         data: student,
         success: function(data){
@@ -310,24 +287,24 @@ function calculateGradeAverage(studentArray){
 // }
 
 function deleteStudentObject(student, studentRow){
+    // console.log('student info: ', student)
     var ajaxConfig = {
         dataType: 'json',
-        url: "https://s-apis.learningfuze.com/sgt/delete",
+        url: "delete",
         method: "post",
         data: {
-            api_key: "bTS3bJ6on1",
-            student_id: student.id
+            student_id: student.id,
         },
         success: function(data){
-            if(data.success){
-            $(".btn").button('reset');
-            student_array.splice(student_array.indexOf(student),1);
-            $(studentRow).closest('tr').remove();
-            calculateGradeAverage(student_array);
-            return;
-        }
-        errorModalDisplay(data.errors);
-                  },
+            if(data){
+                $(".btn").button('reset');
+                student_array.splice(student_array.indexOf(student),1);
+                $(studentRow).closest('tr').remove();
+                calculateGradeAverage(student_array);
+                return;
+            }
+            errorModalDisplay(data.errors);
+        },
         error: function(data){
             errorModalDisplay(data.statusText);
         }
