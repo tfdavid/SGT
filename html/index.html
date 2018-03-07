@@ -15,11 +15,17 @@
             justify-content: center;
             font-size: 4vmin;
         }
+        .btn {
+             margin: 2px;
+        }
         .btn:hover{
             transform: scale(1.1);
         }
         .btn:active{
             transform: scale(.95);
+        }
+        .opBtn{
+            width: 70px;
         }
         .studentTitles th{
             cursor: pointer;
@@ -42,11 +48,29 @@
             height: 120px;
             animation: spin 2s linear infinite;
         }
+        .table > tbody > tr > td {
+            vertical-align: middle;
+        }
+         .inline-inputs {
+            display: inline-block;
+            margin-right: 3%;
+            width: 22%;
+        }
+        .grade-input{
+            display: inline-block;
+            margin-right: 2%;
+            width: 15%;
+        }
+        .editOpsContainer {
+            width: 25.3%;
+            float: right;
+        }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+       
 
 
     </style>

@@ -126,7 +126,6 @@ function dataUpdate(sortType){
         method: "get",
         success: function(data){
             if(data) {
-                // console.log("data is: ", data)
                 student_array = [];
                 data.forEach((val) => {
                     student_array.push(val);
@@ -163,6 +162,30 @@ function handleCancelClick(){
     clearAddStudentFormInputs();
     $(".btn").button('reset');
 }
+
+function checkValidValues(grade, name, course){
+    if (isNaN(parseFloat(grade))) {
+        errorModalDisplay("Not a valid grade number");
+        clearAddStudentFormInputs();
+        return false;
+    }
+    if (name.length < 2) {
+        errorModalDisplay("Name must be at least two characters");
+        clearAddStudentFormInputs();
+        return false;
+    }
+    if (grade < 0 || grade > 100) {
+        errorModalDisplay("Grade needs to be between 0-100");
+        clearAddStudentFormInputs();
+        return false;
+    }
+    if (course.length < 2) {
+        errorModalDisplay("Course must be greater than 2 chars");
+        clearAddStudentFormInputs();
+        return false;
+    }
+    return true;
+}
 /***************************************************************************************************
  * addStudent - creates a student objects based on input fields in the form and adds the object to global student array
  * @param {undefined} none
@@ -174,30 +197,16 @@ function makeStudent(){
     var studentCourse = $("#course").val();
     var studentGrade = $("#studentGrade").val();
     var studentObject = {};
-    if (isNaN(parseFloat(studentGrade))){
-        errorModalDisplay("Not a valid grade number");
-        clearAddStudentFormInputs();
-        return;
+    
+    if(checkValidValues(studentGrade, studentName, studentCourse)){
+        studentObject.name = studentName;
+        studentObject.course = studentCourse;
+        studentObject.grade = studentGrade;
+        addStudentToServer(studentObject);
     }
-    if(studentName.length < 2){
-        errorModalDisplay("Name must be at least two characters");
-        clearAddStudentFormInputs();
-        return;
-    }
-    if(studentGrade < 0 || studentGrade >100){
-        errorModalDisplay("Grade needs to be between 0-100");
-        clearAddStudentFormInputs();
-        return;
-    }
-    if(studentCourse.length < 2){
-        errorModalDisplay("Course must be greater than 2 chars");
-        clearAddStudentFormInputs();
-        return;
-    }
-    studentObject.name = studentName;
-    studentObject.course = studentCourse;
-    studentObject.grade = studentGrade;
-    addStudentToServer(studentObject);
+    else{
+        return false
+    } 
 }
 
 function addStudentToServer(student){
@@ -243,14 +252,122 @@ function renderStudentOnDom(studentObject){
     var studentNameElement = $("<td>").text(studentObject.name);
     var studentCourseElement = $("<td>").text(studentObject.course);
     var studentGradeElement = $("<td>").text(studentObject.grade);
-    var deleteContainer = $("<td>");
-    var deleteButton = $("<button>").addClass("btn btn-danger").text("Delete").attr("id", studentObject.id).on("click", ()=>{
+    var opsContainer = $("<td>");
+    var editButton = $("<button>").addClass("btn btn-success opBtn").text("Edit").attr("id", studentObject.id).on("click", () => {
+        editStudentObject(studentObject, newRow, rowContents);
+    });
+    var deleteButton = $("<button>").addClass("btn btn-danger opBtn").text("Delete").attr("id", studentObject.id).on("click", ()=>{
         deleteStudentObject(studentObject, newRow);
     });
     $("tbody").append(newRow);
-    $(deleteContainer).append(deleteButton);
-    $(newRow).append(studentNameElement, studentCourseElement, studentGradeElement, deleteContainer);
+    $(opsContainer).append(editButton, deleteButton);
+    $(newRow).append(studentNameElement, studentCourseElement, studentGradeElement, opsContainer);
+
+    var rowContents = [studentNameElement, studentCourseElement, studentGradeElement, opsContainer];
+
+
+    function editStudentObject() {
+        newRow.empty();
+        $('form').find('button.btn-danger').click();
+
+        var td = $('<td>').attr('colspan', 4);
+        var form = $('<form>').attr("autocomplete", 'off').on('submit', e=>{
+            e.preventDefault();
+            updateStudentDatabase(form[0], studentObject, cancelOrUpdateEdit, rowContents);
+        })
+        var nameInput = $('<input>', {
+            'type': 'text',
+            'name': 'student',
+            'value': studentObject.name,
+            'class': 'form-control inline-inputs'
+        })
+        var courseInput = $('<input>', {
+            'type': 'text',
+            'name': 'course',
+            'value': studentObject.course,
+            'class': 'form-control inline-inputs'
+        })
+        var gradeInput = $('<input>', {
+            'type': 'text',
+            'name': 'grade',
+            'value': studentObject.grade,
+            'class': 'form-control grade-input'
+        });
+        var opsContainer = $("<div>").addClass("editOpsContainer");
+        var submitButton = $("<button>", {
+            'type': 'submit',
+            'text': 'Submit',
+            'class': 'btn btn-success opBtn',
+            'id': studentObject.id
+        });
+        var cancelButton = $("<button>", {
+            'type': 'button',
+            'text': 'Cancel',
+            'class': 'btn btn-danger opBtn',
+            'id': studentObject.id
+        }).on("click", () => {
+            cancelOrUpdateEdit();
+        });
+        opsContainer.append(submitButton, cancelButton);
+        form.append(nameInput, courseInput, gradeInput, opsContainer);
+        td.append(form)
+        newRow.append(td);
+    }
+    function cancelOrUpdateEdit(contents = rowContents) {
+        editButton.on("click", () => {
+            editStudentObject(studentObject, newRow, contents)
+        });
+        deleteButton.on("click", () => {
+            deleteStudentObject(studentObject, newRow);
+        });
+        newRow.empty().append(contents);
+    }
 }
+
+
+function updateStudentDatabase(newValues, student, modifyDomCallback, elementsForCallback){
+    const { id, author } = student;
+    const name = newValues[0].value
+    ,     course = newValues[1].value
+    ,     grade = newValues[2].value;
+    var ajaxConfig = {
+        dataType: 'json',
+        url: "update",
+        method: "post",
+        data: {
+            id, name, grade, course, author
+        },
+        success: function (data) {
+            if (data) {
+                student.name = name;
+                student.course = course;
+                student.grade = parseFloat(grade);
+
+                elementsForCallback[0][0].textContent = name;
+                elementsForCallback[1][0].textContent = course;
+                elementsForCallback[2][0].textContent = grade;
+                
+                modifyDomCallback(elementsForCallback);
+                
+                return;
+            }
+            errorModalDisplay(data.errors);
+        },
+        error: function (data) {
+            errorModalDisplay(data.statusText);
+        }
+
+    };
+    if(checkValidValues(grade, name, course)){
+        $.ajax(ajaxConfig);
+    }
+    else{
+        modifyDomCallback();
+        return false;
+    }
+}
+
+
 
 /***************************************************************************************************
  * updateStudentList - centralized function to update the average and call student list update
@@ -276,16 +393,13 @@ function calculateGradeAverage(studentArray){
     $(".avgGrade").text(average);
 }
 /***************************************************************************************************
- * renderGradeAverage - updates the on-page grade average
- * @param: {number} average    the grade average
+ * deleteStudentObject - removes student from database and DOM if success
+ * @param: {student} studentRow - student data object and corresponding DOM row
  * @returns {undefined} none
  */
-// function renderGradeAverage(average){
-//     $(".avgGrade").text(average);
-// }
+
 
 function deleteStudentObject(student, studentRow){
-    // console.log('student info: ', student)
     var ajaxConfig = {
         dataType: 'json',
         url: "delete",
@@ -310,6 +424,7 @@ function deleteStudentObject(student, studentRow){
     };
     $.ajax(ajaxConfig);
 }
+
 function errorModalDisplay(data){
     $('#errorModal .modal-body').text();
     $('#errorModal .modal-body').text(data);
@@ -317,5 +432,6 @@ function errorModalDisplay(data){
     $(".btn").button('reset');
     clearAddStudentFormInputs();
 }
+
 
 
