@@ -22,7 +22,6 @@ app.get('/users', (req,res,next)=>{
         });
     });
 app.post('/delete', (req,res,next)=>{
-    console.log("request: ", req.body)
     const { student_id } = req.body;
     let query = 'DELETE FROM students WHERE id = ?';
     let inserts = [student_id];
@@ -33,7 +32,6 @@ app.post('/delete', (req,res,next)=>{
         });
 });
 app.post('/add', (req,res,next)=>{
-    console.log("update: ", req.body);
     const { name, course, grade } = req.body;
     let query = 'INSERT INTO students SET ?'
     let inserts = {name, course, grade, author:1};
@@ -42,6 +40,15 @@ app.post('/add', (req,res,next)=>{
         res.json(results)
     });
 })
+app.post('/update', (req,res,next)=>{
+    const { id, name, course, grade, author } = req.body;
+    let query = 'UPDATE students SET ? WHERE id = ?'
+    let inserts = [{name, course, grade, author}, id];
+    db.query(query, inserts, (err, results, fields)=>{
+        if (err) return next(err)
+        res.json(results)
+    });
+});
 
 app.listen(3000, function(){
     console.log('listening on port 3000')
