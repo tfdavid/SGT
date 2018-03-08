@@ -1,0 +1,25 @@
+{
+  "name": "sgt",
+  "version": "1.0.0",
+  "description": "Version 0.1 is the starting point of the Student Grade Table Project. LearningFuze has provided a base structure that includes HTML structure that will need to be updated with boostrap classes. For this version we are looking to see that you understand how to style an application with bootstrap, take input values and apply them to objects, and update the DOM with a visual of those objects stored.",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mysql": "^2.15.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tfdavid/SGT.git"
+  },
+  "author": "Taylor Davidson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tfdavid/SGT/issues"
+  },
+  "homepage": "https://github.com/tfdavid/SGT#readme"
+}
