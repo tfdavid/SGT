@@ -14,12 +14,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tfdavid/SGT.git"
+    "url": "git+https://github.com/tfdavid/SGT-old.git"
   },
   "author": "Taylor Davidson",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/tfdavid/SGT/issues"
+    "url": "https://github.com/tfdavid/SGT-old/issues"
   },
-  "homepage": "https://github.com/tfdavid/SGT#readme"
+  "homepage": "https://github.com/tfdavid/SGT-old#readme"
 }
