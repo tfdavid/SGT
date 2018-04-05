@@ -59,6 +59,7 @@ function addClickHandlersToElements(){
         }
         sortArray();
     });
+    
 }
 function sortArray(sortType){
     globalSortType = sortType;
@@ -257,8 +258,10 @@ function renderStudentOnDom(studentObject){
         editStudentObject(studentObject, newRow, rowContents);
     });
     var deleteButton = $("<button>").addClass("btn btn-danger opBtn").text("Delete").attr("id", studentObject.id).on("click", ()=>{
-        deleteStudentObject(studentObject, newRow);
+        // deleteStudentObject(studentObject, newRow);
+        confirmDeleteModal(studentObject, newRow);
     });
+   
     $("tbody").append(newRow);
     $(opsContainer).append(editButton, deleteButton);
     $(newRow).append(studentNameElement, studentCourseElement, studentGradeElement, opsContainer);
@@ -318,7 +321,7 @@ function renderStudentOnDom(studentObject){
             editStudentObject(studentObject, newRow, contents)
         });
         deleteButton.on("click", () => {
-            deleteStudentObject(studentObject, newRow);
+            confirmDeleteModal(studentObject, newRow);
         });
         newRow.empty().append(contents);
     }
@@ -432,6 +435,26 @@ function errorModalDisplay(data){
     $(".btn").button('reset');
     clearAddStudentFormInputs();
 }
+function confirmDeleteModal(data, newRow){
+    $("#confirmedDeleteButton").off();
+    $('#confirmDeleteModal .modal-body').text("");
+    // let message = $("<div>").text("Are you sure you want to delete: ")
+    let studentName = $('<div>').text(`Name:  ${data.name}`);
+    let studentCourse = $('<div>').text(`Course: ${data.course}`);
+    let studentGrade = $('<div>').text(`Grade: ${data.grade}`);
 
+    // $('#confirmDeleteModal .modal-body').append(message);
+    $('#confirmDeleteModal .modal-body').append(studentName);
+    $('#confirmDeleteModal .modal-body').append(studentCourse);
+    $('#confirmDeleteModal .modal-body').append(studentGrade);
+    $("#confirmedDeleteButton").on("click", ()=> {
+        console.log("confirmed to delete", data, newRow)
+
+        deleteStudentObject(data, newRow);
+    })
+
+    $('#confirmDeleteModal').modal('show');
+    $(".btn").button('reset');
+}
 
 
