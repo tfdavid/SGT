@@ -2,3 +2,4 @@
 .idea
 node_modules
 credentials.js
+cronjob.php
