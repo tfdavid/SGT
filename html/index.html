@@ -5,6 +5,7 @@
     <!-- <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
     <link href="https://stackpath.bootstrapcdn.com/bootswatch/3.3.7/simplex/bootstrap.min.css" rel="stylesheet" integrity="sha384-C0X5qw1DlkeV0RDunhmi4cUBUkPDTvUqzElcNWm1NI2T4k8tKMZ+wRPQOhZfSJ9N"
     crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style.css">
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 
@@ -12,66 +13,7 @@
     <meta name="viewport" content="initial-scale=1, user-scalable=no">
     <title>SGT</title>
     <style>
-        .modal-title{
-            color: red;
-            justify-content: center;
-            font-size: 4vmin;
-        }
-        .btn {
-             margin: 2px;
-        }
-        .btn:hover{
-            transform: scale(1.1);
-        }
-        .btn:active{
-            transform: scale(.95);
-        }
-        .opBtn{
-            width: 70px;
-        }
-        .studentTitles th{
-            cursor: pointer;
-        }
-        .studentTitles th:hover{
-            transform: scale(1.01) translateY(-8%);
-            background-color: lightgrey;
-            box-shadow: .01em .01em .8em .1em #818181;
-
-        }
-        .studentTitles th:active{
-            transform: scale(.95);
-            background-color: darkgrey;
-        }
-        .loader {
-            /*border: 16px solid #f3f3f3; !* Light grey *!*/
-            border-top: 16px solid #3498db; /* Blue */
-            border-radius: 50%;
-            width: 120px;
-            height: 120px;
-            animation: spin 2s linear infinite;
-        }
-        .table > tbody > tr > td {
-            vertical-align: middle;
-        }
-         .inline-inputs {
-            display: inline-block;
-            margin-right: 3%;
-            width: 22%;
-        }
-        .grade-input{
-            display: inline-block;
-            margin-right: 2%;
-            width: 15%;
-        }
-        .editOpsContainer {
-            width: 25.3%;
-            float: right;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        
        
 
 
@@ -156,7 +98,7 @@
             <div class="form-group">
                 <button type="button" class="btn btn-success" id="addBtn" onclick="">Add</button>
                 <button type="button" class="btn btn-default" id="cancelBtn" onclick="">Clear</button>
-                <button type="button" class="btn btn-info pull-right" id="getData" onclick="">Update Data</button>
+                <button type="button" class="btn btn-info pull-right" id="getData" onclick="">Refresh Data</button>
             </div>
             <div class="form-group">
 

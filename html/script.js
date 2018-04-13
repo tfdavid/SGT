@@ -165,24 +165,24 @@ function handleCancelClick(){
 }
 
 function checkValidValues(grade, name, course){
+    let errors = [];
     if (isNaN(parseFloat(grade))) {
-        errorModalDisplay("Not a valid grade number");
-        clearAddStudentFormInputs();
-        return false;
+        errors.push("Not a valid grade number");
     }
     if (name.length < 2) {
-        errorModalDisplay("Name must be at least two characters");
-        clearAddStudentFormInputs();
-        return false;
+        errors.push("Name must be at least two characters");
     }
     if (grade < 0 || grade > 100) {
-        errorModalDisplay("Grade needs to be between 0-100");
-        clearAddStudentFormInputs();
-        return false;
+        errors.push("Grade needs to be between 0-100");
     }
     if (course.length < 2) {
-        errorModalDisplay("Course must be greater than 2 chars");
-        clearAddStudentFormInputs();
+        errors.push("Course must be greater than 2 chars");
+    }
+    if(grade.length >4 && grade.indexOf('.') !== -1){
+        errors.push("Grade must be rounded to nearest tenth");
+    }
+    if(errors.length>0){
+        errorModalDisplay(errors);
         return false;
     }
     return true;
@@ -429,11 +429,14 @@ function deleteStudentObject(student, studentRow){
 }
 
 function errorModalDisplay(data){
-    $('#errorModal .modal-body').text();
-    $('#errorModal .modal-body').text(data);
+    $('#errorModal .modal-body').text("");
+    data.forEach(v => {
+        let message = $('<div>').text(v);
+        $('.modal-body').append(message);
+    });
     $('#errorModal').modal('show');
     $(".btn").button('reset');
-    clearAddStudentFormInputs();
+    // clearAddStudentFormInputs();
 }
 function confirmDeleteModal(data, newRow){
     $("#confirmedDeleteButton").off();
@@ -448,7 +451,7 @@ function confirmDeleteModal(data, newRow){
     $('#confirmDeleteModal .modal-body').append(studentCourse);
     $('#confirmDeleteModal .modal-body').append(studentGrade);
     $("#confirmedDeleteButton").on("click", ()=> {
-        console.log("confirmed to delete", data, newRow)
+        // console.log("confirmed to delete", data, newRow)
 
         deleteStudentObject(data, newRow);
     })
