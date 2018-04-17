@@ -273,7 +273,12 @@ function renderStudentOnDom(studentObject){
         newRow.empty();
         $('form').find('button.btn-danger').click();
 
-        var td = $('<td>').attr('colspan', 4);
+        var td = $('<td>').attr('colspan', 4).on("keydown", e => {
+            console.log('testing keydown')
+            if (e.which === 27) {
+                cancelOrUpdateEdit();
+            }
+        });
         var form = $('<form>').attr("autocomplete", 'off').on('submit', e=>{
             e.preventDefault();
             updateStudentDatabase(form[0], studentObject, cancelOrUpdateEdit, rowContents);
@@ -316,6 +321,14 @@ function renderStudentOnDom(studentObject){
         td.append(form)
         newRow.append(td);
     }
+    // $(document).keyup(function (e) {
+    //     if (e.keyCode == 27) {
+    //         alert('Esc key is press');
+    //     }
+    // });
+    let e = jQuery.Event("keyup");
+    e.keyCode = 27;
+
     function cancelOrUpdateEdit(contents = rowContents) {
         editButton.on("click", () => {
             editStudentObject(studentObject, newRow, contents)
