@@ -32,24 +32,39 @@ function addClickHandlersToElements(){
     $("#getData").on("click", ()=>dataUpdate(globalSortType));
 
     $(".studentNameTitle").on("click", ()=>{
+        $(".studentTitles > th > span").remove();
         if(globalSortType==="name"){
             sortArray("nameRev");
+            let arrow = $("<span>").addClass("glyphicon glyphicon-menu-down");
+            $(".studentNameTitle").append(arrow);
             return;
         }
+        let arrow = $("<span>").addClass("glyphicon glyphicon-menu-up");
+        $(".studentNameTitle").append(arrow);
         sortArray('name');
     });
     $(".studentCourseTitle").on("click", ()=>{
+        $(".studentTitles > th > span").remove();
         if(globalSortType==="course"){
             sortArray("courseRev");
+            let arrow = $("<span>").addClass("glyphicon glyphicon-menu-down");
+            $(".studentCourseTitle").append(arrow);
             return;
         }
+        let arrow = $("<span>").addClass("glyphicon glyphicon-menu-up");
+        $(".studentCourseTitle").append(arrow);
         sortArray('course');
     });
     $(".studentGradeTitle").on("click", ()=>{
+        $(".studentTitles > th > span").remove();
         if(globalSortType==="grade"){
             sortArray("gradeRev");
+            let arrow = $("<span>").addClass("glyphicon glyphicon-menu-down");
+            $(".studentGradeTitle").append(arrow);
             return;
         }
+        let arrow = $("<span>").addClass("glyphicon glyphicon-menu-up");
+        $(".studentGradeTitle").append(arrow);
         sortArray('grade');
     });
     $(".dateSort").on("click", ()=>{
