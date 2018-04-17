@@ -68,6 +68,7 @@ function addClickHandlersToElements(){
         sortArray('grade');
     });
     $(".dateSort").on("click", ()=>{
+        $(".studentTitles > th > span").remove();
         if(globalSortType==="id"){
             sortArray("idRev");
             return;
