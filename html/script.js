@@ -57,15 +57,15 @@ function addClickHandlersToElements(){
     });
     $(".studentGradeTitle").on("click", ()=>{
         $(".studentTitles > th > span").remove();
-        if(globalSortType==="grade"){
-            sortArray("gradeRev");
+        if (globalSortType ==="gradeRev"){
+            sortArray("grade");
             let arrow = $("<span>").addClass("glyphicon glyphicon-menu-down");
             $(".studentGradeTitle").append(arrow);
             return;
         }
         let arrow = $("<span>").addClass("glyphicon glyphicon-menu-up");
         $(".studentGradeTitle").append(arrow);
-        sortArray('grade');
+        sortArray('gradeRev');
     });
     $(".dateSort").on("click", ()=>{
         $(".studentTitles > th > span").remove();
